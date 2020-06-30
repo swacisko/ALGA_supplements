@@ -1,0 +1,60 @@
+#!/bin/bash
+
+# SBATCH -p bigmem
+# SBATCH --mem=200000
+
+#SBATCH --ntasks=1                   # Run a single task	
+#SBATCH --cpus-per-task=16            # Number of CPU cores per task
+
+
+#SBATCH --get-user-env
+
+#SBATCH --output=quastR.out
+#SBATCH --error=quastR.err
+
+
+# the name of the sample to process should be passed as the first parameter (e.g cel)
+
+MIN_CONT=250
+MIN_ALIGN=250
+if [ ${1,,} = "chl" ]
+then
+	MIN_CONT=500
+	MIN_ALIGN=500
+fi
+
+quastMode="scaffolds"
+
+if [ ${quastMode} = "contigs" ]
+then
+COMMAND="./quast-5.0.2/quast.py \
+	${1^^}/*.fasta \
+	-R ../data/${1^^}/${1,,}-genome.fast? \
+	--min-contig $MIN_CONT \
+	--threads 16 \
+	--ambiguity-usage one \
+	--space-efficient \
+	-o ${1^^}/quast_results_swat"
+
+ chmod 777 ${1^^}/quast_results_swat
+fi
+
+if [ ${quastMode} = "scaffolds" ]
+then
+COMMAND="./quast-5.0.2/quast.py \
+       ${1^^}/scaffolds/*.fasta \
+      -R ../data/${1^^}/${1,,}-genome.fast? \
+      --min-contig $MIN_CONT \
+        --threads 16 \
+        --ambiguity-usage one \
+        --space-efficient \
+        -o ${1^^}/quast_results_scaffolds"
+
+
+chmod 777 ${1^^}/quast_results_scaffolds
+
+fi
+
+printf "\nCOMMAND: $COMMAND \n"
+
+exec $COMMAND

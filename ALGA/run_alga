@@ -1,0 +1,29 @@
+#!/bin/bash
+
+#SBATCH -p bigmem
+# SBATCH --mem=200000
+
+#SBATCH --ntasks=1                   # Run a single task	
+#SBATCH --cpus-per-task=18            # Number of CPU cores per task
+
+
+#SBATCH --get-user-env
+
+#SBATCH --output=rALGA.out
+#SBATCH --error=rALGA.err
+
+# the first parameter should be the name of the sample (e.g lux)
+# the second parameter should be extension of reads, that is _musket, _trimmed or _trimmed_musket
+# the third  parameter should contain a string in which are written all getopts (e.g "--scale=0.66 --threads=16 --retl=4"
+
+module load plgrid/tools/gcc/4.9.4
+
+# FPATH="../../data/${1^^}/${1,,}"
+FPATH="../../data/${1^^}/${1,,}${2}"
+
+PARAMS="--file1=${FPATH}_1.fastq --file2=${FPATH}_2.fastq --threads=16 --redirect_cerr=1 $3"
+printf "\nPARAMS: $PARAMS \n\n"
+
+RES_FILE_NAME="ALGA_${1,,}_resources"
+/usr/bin/time -o $RES_FILE_NAME -a -v ./ALGA $PARAMS
+printf "\n\n" >> $RES_FILE_NAME

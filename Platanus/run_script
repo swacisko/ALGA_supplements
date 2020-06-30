@@ -1,0 +1,42 @@
+#!/bin/bash
+
+#SBATCH -p bigmem
+# SBATCH --mem=200000
+
+#SBATCH --ntasks=1                   # Run a single task	
+#SBATCH --cpus-per-task=18            # Number of CPU cores per task
+
+
+#SBATCH --get-user-env
+
+#SBATCH --output=rPLAT.out
+#SBATCH --error=rPLAT.err
+
+# the first parameter should be the name of the sample (e.g lux)
+# the second parameter should be extension of reads, that is _musket, _trimmed or _trimmed_musket
+# the third  parameter should contain a string in which are written all getopts (e.g "--scale=0.66 --threads=16 --retl=4"
+
+#module load plgrid/tools/gcc/4.9.4
+
+name=${1,,}
+
+
+ln -s ../../data/${1^^}/${name}_1.fastq ${name}_1.fastq
+ln -s ../../data/${1^^}/${name}_2.fastq ${name}_2.fastq
+
+# ls -alt
+
+RES_FILE_NAME="PLATANUS_${1,,}_resources"
+/usr/bin/time -o $RES_FILE_NAME -a -v ./platanus_trim ${name}_1.fastq ${name}_2.fastq
+printf "\n\n" >> $RES_FILE_NAME
+
+# ls -alt
+
+mv ${name}_1.fastq.trimmed ${name}_1_trimmed.fastq
+mv ${name}_2.fastq.trimmed ${name}_2_trimmed.fastq
+
+# ls -alt
+
+/usr/bin/time -o $RES_FILE_NAME -a -v ./platanus assemble -o plat_${name} -f ${name}_[12]_trimmed.fastq -t 16 -m 128 2> plat_${name}_assemble.log
+
+./run_scaffolds ${name}
