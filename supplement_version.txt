@@ -50,3 +50,7 @@ q2=IN_2
 
 #SPADES
 BIN/spades.py -k 21,33,55,77 --careful --pe1-1 IN_1 --pe1-2 IN_2 -o OUT
+
+#VELVET
+velveth OUT_prefix 51 -short -separate -fastq IN_1 IN_2
+velvetg OUT_prefix -ins_length INSERT_SIZE -ins_lengh_sd INSERT_SIZE_STD -exp_cov EXPECTED_COVERAGE -scaffolding no -min_contig_lgth 250
