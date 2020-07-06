@@ -1,0 +1,21 @@
+#!/bin/bash
+
+#SBATCH -p bigmem
+# SBATCH --mem=200000
+
+#SBATCH --ntasks=1                   # Run a single task        
+#SBATCH --cpus-per-task=18            # Number of CPU cores per task
+
+
+#SBATCH --get-user-env
+
+#SBATCH --output=logs/ara_racer.out
+#SBATCH --error=logs/ara_racer.err
+
+
+module load python/3.7.0
+
+/usr/bin/time -v -o times/ara_racer.log bin/spades.py -k 21,33,55,77 --careful \
+  --pe1-1  /home/users-groups/grant_452/plg/alga_tests/data/ARA/ara_racer_1.fastq \
+  --pe1-2  /home/users-groups/grant_452/plg/alga_tests/data/ARA/ara_racer_2.fastq \
+  -o results/ara_racer

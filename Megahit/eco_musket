@@ -1,0 +1,22 @@
+#!/bin/bash
+
+#SBATCH -p bigmem
+# SBATCH --mem=200000
+
+#SBATCH --ntasks=1                   # Run a single task	
+#SBATCH --cpus-per-task=18            # Number of CPU cores per task
+
+
+#SBATCH --get-user-env
+
+#SBATCH --output=logs/eco_musket.out
+#SBATCH --error=logs/eco_musket.err
+
+
+module load python/3.7.0
+
+/usr/bin/time -v -o times/eco_musket.log bin/megahit \
+  -1 /home/users-groups/grant_452/plg/alga_tests/data/ECO/eco_musket_1.fastq \
+  -2 /home/users-groups/grant_452/plg/alga_tests/data/ECO/eco_musket_2.fastq \
+  -t 16 \
+  -o results/eco_musket

@@ -1,0 +1,15 @@
+#!/bin/bash
+
+#SBATCH -p bigmem
+# SBATCH --mem=200000
+
+#SBATCH --ntasks=1                   # Run a single task        
+#SBATCH --cpus-per-task=18            # Number of CPU cores per task
+
+
+#SBATCH --get-user-env
+
+#SBATCH --output=logs/lux_musket.out
+#SBATCH --error=logs/lux_musket.err
+
+/usr/bin/time -v -o times/lux_musket.log ./SOAPdenovo-63mer all -s sbatch_scripts/lux_musket.conf -K 63 -R -o results/lux_musket/res

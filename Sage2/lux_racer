@@ -1,0 +1,18 @@
+#!/bin/bash
+
+#SBATCH -p bigmem
+# SBATCH --mem=200000
+
+#SBATCH --ntasks=1                   # Run a single task	
+#SBATCH --cpus-per-task=18            # Number of CPU cores per task
+
+
+#SBATCH --get-user-env
+
+#SBATCH --output=logs/lux_racer.out
+#SBATCH --error=logs/lux_racer.err
+
+/usr/bin/time -v -o times/lux_racer.log ./SAGE2 \
+  -l /home/users-groups/grant_452/plg/alga_tests/algos/SAGE/SAGE2/sbatch_scripts/lux_racer.list \
+  -o results/lux_racer \
+  -p lux_racer -k 50 -d -s

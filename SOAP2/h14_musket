@@ -1,0 +1,15 @@
+#!/bin/bash
+
+#SBATCH -p bigmem
+# SBATCH --mem=200000
+
+#SBATCH --ntasks=1                   # Run a single task        
+#SBATCH --cpus-per-task=18            # Number of CPU cores per task
+
+
+#SBATCH --get-user-env
+
+#SBATCH --output=logs/h14_musket.out
+#SBATCH --error=logs/h14_musket.err
+
+/usr/bin/time -v -o times/h14_musket.log ./SOAPdenovo-63mer all -s sbatch_scripts/h14_musket.conf -K 63 -R -o results/h14_musket/res

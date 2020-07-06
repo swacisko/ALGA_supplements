@@ -1,0 +1,23 @@
+#!/bin/bash
+
+#SBATCH -p bigmem
+# SBATCH --mem=200000
+
+#SBATCH --ntasks=1                   # Run a single task        
+#SBATCH --cpus-per-task=18            # Number of CPU cores per task
+
+
+#SBATCH --get-user-env
+
+#SBATCH --output=logs/cel_musket.out
+#SBATCH --error=logs/cel_musket.err
+
+/usr/bin/time -v -o times/cel_musket.1.log bin/gt readjoiner prefilter \
+  -readset results/cel_musket \
+  -db /home/users-groups/grant_452/plg/alga_tests/data/CEL/cel_musket_1.fastq:/home/users-groups/grant_452/plg/alga_tests/data/CEL/cel_musket_2.fastq:225
+
+/usr/bin/time -v -o times/cel_musket.2.log bin/gt -j 8 readjoiner overlap \
+  -readset results/cel_musket \
+  -l 60
+
+/usr/bin/time -v -o times/cel_musket.3.log bin/gt readjoiner assembly -spmfiles 8 -readset results/cel_musket -l 60

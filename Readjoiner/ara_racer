@@ -1,0 +1,23 @@
+#!/bin/bash
+
+#SBATCH -p bigmem
+# SBATCH --mem=200000
+
+#SBATCH --ntasks=1                   # Run a single task        
+#SBATCH --cpus-per-task=18            # Number of CPU cores per task
+
+
+#SBATCH --get-user-env
+
+#SBATCH --output=logs/ara_racer.out
+#SBATCH --error=logs/ara_racer.err
+
+/usr/bin/time -v -o times/ara_racer.1.log bin/gt readjoiner prefilter \
+  -readset results/ara_racer \
+  -db /home/users-groups/grant_452/plg/alga_tests/data/ARA/ara_racer_1.fastq:/home/users-groups/grant_452/plg/alga_tests/data/ARA/ara_racer_2.fastq:250
+
+/usr/bin/time -v -o times/ara_racer.2.log bin/gt -j 8 readjoiner overlap \
+  -readset results/ara_racer \
+  -l 60
+
+/usr/bin/time -v -o times/ara_racer.3.log bin/gt readjoiner assembly -spmfiles 8 -readset results/ara_racer -l 60

@@ -1,0 +1,15 @@
+#!/bin/bash
+
+#SBATCH -p bigmem
+# SBATCH --mem=200000
+
+#SBATCH --ntasks=1                   # Run a single task        
+#SBATCH --cpus-per-task=18            # Number of CPU cores per task
+
+
+#SBATCH --get-user-env
+
+#SBATCH --output=logs/eco_musket.out
+#SBATCH --error=logs/eco_musket.err
+
+/usr/bin/time -v -o times/eco_musket.log ./SOAPdenovo-63mer all -s sbatch_scripts/eco_musket.conf -K 63 -R -o results/eco_musket/res
