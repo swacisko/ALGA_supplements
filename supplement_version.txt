@@ -1,9 +1,8 @@
-BIN - folder z binarka
-IN_1 - pierwszy plik z readami
-IN_2 - drugi plik z readami
-OUT - folder zapisu
-INSERT_SIZE
-
+BIN - directory with binaries of an assembler
+IN_1 - first file with paired reads
+IN_2 - second file with paired reads
+OUT - output directory
+INSERT_SIZE - insert size
 
 # ALGA
 ./ALGA --file1=IN_1 --file2=IN_2 --threads=16 --output=OUT
