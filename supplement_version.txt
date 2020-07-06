@@ -5,6 +5,15 @@ OUT - folder zapisu
 INSERT_SIZE
 
 
+# ALGA
+./ALGA --file1=IN_1 --file2=IN_2 --threads=16 --redirect_cerr=1 OPTS
+
+# GRASShopPER
+grasshopper prepreocess IN_1 IN_2
+grasshopper build OUT_prefix
+grasshopper traverse OUT_prefix -ss=SS_PARAM -fs=FS_PARAM
+grasshopper correct OUT_prefix -minconf=MINCONF_PARAM -maxrefs=MAXREFS_PARAM
+
 # Megahit
 BIN/megahit -1 IN_1 -2 IN_2 -t 16 -o OUT
 
@@ -48,9 +57,16 @@ map_len=32
 q1=IN_1
 q2=IN_2
 
-#SPADES
+# SPADES
 BIN/spades.py -k 21,33,55,77 --careful --pe1-1 IN_1 --pe1-2 IN_2 -o OUT
 
-#VELVET
+# VELVET
 velveth OUT_prefix 51 -short -separate -fastq IN_1 IN_2
 velvetg OUT_prefix -ins_length INSERT_SIZE -ins_lengh_sd INSERT_SIZE_STD -exp_cov EXPECTED_COVERAGE -scaffolding no -min_contig_lgth 250
+
+# Platanus
+
+./platanus_trim IN_1 IN_2
+mv IN_1.trimmed IN_1_trimmed.fastq
+mv IN_2.trimmed IN_2_trimmed.fastq
+./platanus assemble -o OUT_prefix -f IN_[12]_trimmed.fastq -t 16 -m 128
