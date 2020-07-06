@@ -1,0 +1,52 @@
+BIN - folder z binarka
+IN_1 - pierwszy plik z readami
+IN_2 - drugi plik z readami
+OUT - folder zapisu
+INSERT_SIZE
+
+
+# Megahit
+BIN/megahit -1 IN_1 -2 IN_2 -t 16 -o OUT
+
+# Readjoiner
+BIN/gt readjoiner prefilter -readset OUT -db IN_1:IN_2:INSERT_SIZE
+BIN/gt -j 8 readjoiner overlap -readset OUT -l 60
+BIN/gt readjoiner assembly -spmfiles 8 -readset OUT -l 60
+
+# Sage2
+BIN/SAGE2 -l conf_file -o OUT -p OUT_prefix -k 50 -d -s
+
+conf_file:
+f1=IN_1
+f2=IN_2
+
+# SGA
+sga preprocess --pe-mode 1 -o OUT/tmp.fastq IN_1 IN_2
+sga index -a ropebwt -t 16 --no-reverse -p OUT/tmp OUT/tmp.fastq
+sga correct -k 41 --discard --learn -t 16 -o OUT/reads.ec.k41.fastq -p OUT/tmp OUT/tmp.fastq
+sga index -a ropebwt -t 16 -p OUT/reads.ec.k41 OUT/reads.ec.k41.fastq
+sga filter -x 2 -t 16 --homopolymer-check --low-complexity-check -p OUT/reads.ec.k41 -o OUT/reads.ec.k41.fastq.filter.pass.fa OUT/reads.ec.k41.fastq
+sga fm-merge -m 55 -t 16 -o OUT/merged.k41.fa -p OUT/reads.ec.k41.fastq.filter.pass OUT/reads.ec.k41.fastq.filter.pass.fa
+sga index -d 1000000 -t 16 -p OUT/merged.k41 OUT/merged.k41.fa
+sga rmdup -t 16 -p OUT/merged.k41 -o OUT/merged.k41.fa.rmdup.fa OUT/merged.k41.fa
+sga overlap -m 55 -t 16 -v -p OUT/merged.k41.fa.rmdup OUT/merged.k41.fa.rmdup.fa
+sga assemble -m 75 -g 0 -r 10 -o OUT/assemble.m75 OUT/merged.k41.fa.rmdup.asqg.gz
+
+# SOAP2
+BIN/SOAPdenovo-63mer all -s conf_file -K 63 -R -o OUT/res
+
+conf_file:
+max_rd_len=300
+[LIB]
+avg_ins=INSERT_SIZE
+reverse_seq=0
+asm_flags=3
+rd_len_cutoff=300
+rank=1
+pair_num_cutoff=3
+map_len=32
+q1=IN_1
+q2=IN_2
+
+#SPADES
+BIN/spades.py -k 21,33,55,77 --careful --pe1-1 IN_1 --pe1-2 IN_2 -o OUT
